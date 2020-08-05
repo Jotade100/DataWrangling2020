@@ -3,11 +3,10 @@ title: "Laboratorio 1"
 author: "Juan Diego Sique Martínez"
 date: "5/8/2020 AD"
 output:
-  
-  pdf_document: default
   html_document: 
     toc: yes
     keep_md: yes
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}

@@ -7,7 +7,6 @@ output:
     toc: yes
     keep_md: yes
   pdf_document: default
-  
 ---
 
 
