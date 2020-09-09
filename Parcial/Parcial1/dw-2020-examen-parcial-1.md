@@ -31,12 +31,12 @@ Indicaciones generales:
 ``` r
 set.seed(20170480) 
 v<- 1:10
-preguntas <-sort(sample(v, size = 6, replace = FALSE ))
+preguntas <-sort(sample(v, size = 5, replace = FALSE ))
 
 paste0("Mis preguntas a resolver son: ",paste0(preguntas,collapse = ", "))
 ```
 
-    ## [1] "Mis preguntas a resolver son: 1, 4, 6, 7, 9, 10"
+    ## [1] "Mis preguntas a resolver son: 1, 6, 7, 9, 10"
 
 ### Listado de preguntas teóricas
 
@@ -189,19 +189,19 @@ Respondiendo en orden a los puntos:
 
     filter(df, variable == "valor")
 
-## Segunda pregunta (4)
+## Segunda pregunta (4) {Me salió la vez cuando el parámetro estaba en 6}
 
 No es lo mismo `==` y `=`. `==` se usa para comparaciones, pongo como
 ejemplo la función filter. `=` se usa para asignar valores y tiene como
 equivalente `<-`.
 
-## Tercera pregunta (6)
+## Segunda pregunta (6)
 
 Respondiendo de manera sobria y directa: Una Lista puede contener datos
 con distintos tipos como: Numeric, Character, logical, etc. Un Vector es
 similar, pero todos los elementos son del mismo tipo.
 
-## Cuarta pregunta (7)
+## Tercera pregunta (7)
 
 Yo lo agregaría de la siguiente manera. El único problema sería que no
 tendría mucho sentido a no ser de que se vaya a usar la nueva etiqueta.
@@ -221,6 +221,12 @@ BY`. Utilizo como ejemplo:
 Se hace una agrupación por país, con el conteo de clientes, pero en vez
 de usar la cláusula `WHERE`se utiliza `HAVING` para indicar que sólo
 queremos los datos cuyo conteo es mayor que 5.
+
+## Quinta pregunta (10)
+
+La pregunta es algo extraña. Yo lo que haría sería
+
+`SELECT * FROM A LEFT JOIN B ON A.KEY = B.KEY WHERE B.KEY IS NULL`
 
 ## EXTRA (E)
 
