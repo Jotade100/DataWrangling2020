@@ -224,7 +224,10 @@ queremos los datos cuyo conteo es mayor que 5.
 
 ## Quinta pregunta (10)
 
-La pregunta es algo extraña. Yo lo que haría sería
+La pregunta es algo extraña. Yo lo que haría sería:
+
+> Con LEFT obtengo todo lo de A, como usé \* me permite obtener todos
+> los registros y sólo filtro por los vacíos.
 
 `SELECT * FROM A LEFT JOIN B ON A.KEY = B.KEY WHERE B.KEY IS NULL`
 
