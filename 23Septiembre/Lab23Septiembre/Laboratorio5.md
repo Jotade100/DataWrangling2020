@@ -1,40 +1,10 @@
----
-title: "Laboratorio 5"
-author: "Juan Diego Sique"
-date: "23 de septiembre de 2020 AD"
-output:
-  md_document: 
-    variant: markdown_github
-  html_document: default
-  pdf_document: default
----
+Primer inciso
+-------------
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(nycflights13)
-library(tidyverse)
-library(lubridate)
-library(readr)
-library(readxl)
-library(knitr)
-hook_output = knit_hooks$get('output')
-knit_hooks$set(output = function(x, options) {
-  # this hook is used only when the linewidth option is not NULL
-  if (!is.null(n <- options$linewidth)) {
-    x = knitr:::split_lines(x)
-    # any lines wider than n should be wrapped
-    if (any(nchar(x) > n)) x = strwrap(x, width = n)
-    x = paste(x, collapse = '\n')
-  }
-  hook_output(x, options)
-})
-```
+Para calcular el resultado hice unas dimensiones propias. Luego las
+sumé.
 
-## Primer inciso
-
-Para calcular el resultado hice unas dimensiones propias. Luego las sumé.
-
-```{r }
+``` r
 ## Primer inciso
 # Ignorando zona horaria que no es importante en fenómenos astronómicos
 # Creando la fecha base
@@ -54,15 +24,18 @@ resp <- paste0("La fecha del siguiente eclipse es ", pred, sep=" ")
 resp
 ```
 
-## Segundo inciso
+    ## [1] "La fecha del siguiente eclipse es 2035-09-02 02:09:49 "
 
+Segundo inciso
+--------------
 
+Tercer inciso
+-------------
 
-## Tercer inciso
+Usé una librería que ya me daba el resultado zodiacal a partir de una
+fecha. Para ello es necesario usar la siguiente función.
 
-Usé una librería que ya me daba el resultado zodiacal a partir de una fecha. Para ello es necesario usar la siguiente función.
-
-```{r }
+``` r
 library(DescTools)
 
 calcular_zodiaco <- function() {
@@ -73,27 +46,25 @@ calcular_zodiaco <- function() {
 }
 ```
 
-
 Para ejecutarla basta con hacer el siguiente llamado.
 
-```{r eval=FALSE}
-
+``` r
 calcular_zodiaco()
 ```
 
 El resultado sería el siguiente:
-```
-Ingrese su fecha de nacimiento (Día-Mes_Año): 10 de octubre de 1997
-[1] Libra
-```
 
+    Ingrese su fecha de nacimiento (Día-Mes_Año): 10 de octubre de 1997
+    [1] Libra
 
-## Cuarto inciso
+Cuarto inciso
+-------------
 
-Primero filtré para obtener los datos válidos. Luego la suma del resultado del retraso total lo obtuve a partir de dos columnas con las que ya contaba el dataset.
+Primero filtré para obtener los datos válidos. Luego la suma del
+resultado del retraso total lo obtuve a partir de dos columnas con las
+que ya contaba el dataset.
 
-```{r eval=FALSE}
-
+``` r
 ## Filtrando vuelos con fechas y horas válidas
 vuelos <- flights %>% filter(!is.na(dep_time), !is.na(arr_time), dep_time >= 100, arr_time >=100)
 
@@ -107,4 +78,3 @@ vuelos$Hora_llegada_estimada <- ymd_hm(paste(vuelos$year, vuelos$month, vuelos$d
 
 vuelos$Retraso = vuelos$dep_delay + vuelos$arr_delay
 ```
-
