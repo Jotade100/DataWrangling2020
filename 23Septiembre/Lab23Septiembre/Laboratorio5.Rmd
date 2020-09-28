@@ -3,10 +3,10 @@ title: "Laboratorio 5"
 author: "Juan Diego Sique"
 date: "23 de septiembre de 2020 AD"
 output:
+  pdf_document: default
   md_document: 
     variant: markdown_github
   html_document: default
-  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +16,8 @@ library(tidyverse)
 library(lubridate)
 library(readr)
 library(readxl)
+library(openxlsx)
+library(chron)
 library(knitr)
 hook_output = knit_hooks$get('output')
 knit_hooks$set(output = function(x, options) {
@@ -55,6 +57,87 @@ resp
 ```
 
 ## Segundo inciso
+
+1. El mes en que hay más llamadas por código es:
+**Marzo, con 497 llamadas**
+
+```{r }
+data <- read.csv("data.csv", sep=";")
+
+data$`Fecha.Creación` <- dmy(data$`Fecha.Creación`)
+
+
+data$`Fecha.Final` <- dmy(data$`Fecha.Final`)
+
+
+primer <- data %>% group_by(month(Fecha.Creación), Cod) %>% summarise(llamadas = sum(Call)) %>% filter(llamadas > 0) %>% arrange(desc(llamadas))
+primer <- primer %>% rename(mes = `month(Fecha.Creación)`)
+head(primer, 1)
+```
+
+2. El día más ocupado es:
+**Domingo**
+
+```{r }
+segundo <- data %>% group_by(wday(Fecha.Creación, label = TRUE)) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(desc(total))
+
+head(segundo, 1)
+```
+
+3. El mes más ocupado es:
+**Marzo**
+
+```{r }
+tercero <- data %>% group_by(month(Fecha.Creación)) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(desc(total))
+
+
+head(tercero, 1)
+```
+
+
+4. Sí se puede apreciar una especie de estacionalidad, donde cada dos meses hay un pico a la baja. Si se tuviera datos de más años sería genial para poder comparar estacionalidad durante el año y no sólo mes a mes.
+
+
+```{r include=FALSE}
+library(ggplot2)
+theme_set(theme_minimal())
+cuarto <- data %>% group_by(Fecha.Creación) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(Fecha.Creación)
+ggplot(data = cuarto, aes(x = Fecha.Creación, y = llamadas))+
+  geom_line(color = "#00AFBB", size = 1)
+```
+
+
+![](Rplot.png)
+
+
+5. Una llamada promedio dura casi 8 minutos. (7.8 aproximadamente.) 
+
+
+```{r }
+data$Día.Creación <- paste(data$Fecha.Creación, data$Hora.Creación)
+data$Día.Creación <- parse_date_time(data$Día.Creación, c('%Y-%m-%d %I:%M %p'))
+data$Día.Final <- paste(data$Fecha.Final, data$Hora.Final)
+data$Día.Final <- parse_date_time(data$Día.Final, c('%Y-%m-%d %I:%M %p'))
+
+
+quinto_data <- data %>% filter(Call > 0) 
+
+quinto <- mean(
+  difftime(quinto_data$Día.Final, quinto_data$Día.Creación, units = 'mins')
+  )
+quinto
+```
+
+6. De la tabla excluí los valores negativos que eran errores de fecha probablemente.
+
+
+```{r }
+sexto <- quinto_data
+sexto$tiempo_de_llamada <- difftime(sexto$Día.Final, sexto$Día.Creación, units = 'mins')
+sexto <- sexto %>% group_by(tiempo_de_llamada) %>% summarise(llamada = sum(Call)) %>%  arrange(tiempo_de_llamada) %>% filter(tiempo_de_llamada > -1)
+sexto
+```
+
 
 
 

@@ -29,6 +29,124 @@ resp
 Segundo inciso
 --------------
 
+1.  El mes en que hay más llamadas por código es: **Marzo, con 497
+    llamadas**
+
+``` r
+data <- read.csv("data.csv", sep=";")
+
+data$`Fecha.Creación` <- dmy(data$`Fecha.Creación`)
+
+
+data$`Fecha.Final` <- dmy(data$`Fecha.Final`)
+
+
+primer <- data %>% group_by(month(Fecha.Creación), Cod) %>% summarise(llamadas = sum(Call)) %>% filter(llamadas > 0) %>% arrange(desc(llamadas))
+```
+
+    ## `summarise()` regrouping output by 'month(Fecha.Creación)' (override with `.groups` argument)
+
+``` r
+primer <- primer %>% rename(mes = `month(Fecha.Creación)`)
+head(primer, 1)
+```
+
+    ## # A tibble: 1 x 3
+    ## # Groups:   mes [1]
+    ##     mes Cod                          llamadas
+    ##   <dbl> <chr>                           <int>
+    ## 1     3 Actualización de Información      497
+
+1.  El día más ocupado es: **Domingo**
+
+``` r
+segundo <- data %>% group_by(wday(Fecha.Creación, label = TRUE)) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(desc(total))
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+``` r
+head(segundo, 1)
+```
+
+    ## # A tibble: 1 x 5
+    ##   `wday(Fecha.Creación, label = TRUE)` llamadas correo mensaje total
+    ##   <ord>                                   <int>  <int>   <int> <int>
+    ## 1 "dom\\."                                  796   9124   28334 38254
+
+1.  El mes más ocupado es: **Marzo**
+
+``` r
+tercero <- data %>% group_by(month(Fecha.Creación)) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(desc(total))
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+``` r
+head(tercero, 1)
+```
+
+    ## # A tibble: 1 x 5
+    ##   `month(Fecha.Creación)` llamadas correo mensaje total
+    ##                     <dbl>    <int>  <int>   <int> <int>
+    ## 1                       3      497   5448   16763 22708
+
+1.  Sí se puede apreciar una especie de estacionalidad, donde cada dos
+    meses hay un pico a la baja. Si se tuviera datos de más años sería
+    genial para poder comparar estacionalidad durante el año y no sólo
+    mes a mes.
+
+![](Rplot.png)
+
+1.  Una llamada promedio dura casi 8 minutos. (7.8 aproximadamente.)
+
+``` r
+data$Día.Creación <- paste(data$Fecha.Creación, data$Hora.Creación)
+data$Día.Creación <- parse_date_time(data$Día.Creación, c('%Y-%m-%d %I:%M %p'))
+data$Día.Final <- paste(data$Fecha.Final, data$Hora.Final)
+data$Día.Final <- parse_date_time(data$Día.Final, c('%Y-%m-%d %I:%M %p'))
+
+
+quinto_data <- data %>% filter(Call > 0) 
+
+quinto <- mean(
+  difftime(quinto_data$Día.Final, quinto_data$Día.Creación, units = 'mins')
+  )
+quinto
+```
+
+    ## Time difference of 7.766638 mins
+
+1.  De la tabla excluí los valores negativos que eran errores de fecha
+    probablemente.
+
+``` r
+sexto <- quinto_data
+sexto$tiempo_de_llamada <- difftime(sexto$Día.Final, sexto$Día.Creación, units = 'mins')
+sexto <- sexto %>% group_by(tiempo_de_llamada) %>% summarise(llamada = sum(Call)) %>%  arrange(tiempo_de_llamada) %>% filter(tiempo_de_llamada > -1)
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+``` r
+sexto
+```
+
+    ## # A tibble: 31 x 2
+    ##    tiempo_de_llamada llamada
+    ##    <drtn>              <int>
+    ##  1 0 mins                221
+    ##  2 1 mins                211
+    ##  3 2 mins                173
+    ##  4 3 mins                195
+    ##  5 4 mins                193
+    ##  6 5 mins                184
+    ##  7 6 mins                193
+    ##  8 7 mins                196
+    ##  9 8 mins                209
+    ## 10 9 mins                165
+    ## # ... with 21 more rows
+
 Tercer inciso
 -------------
 
