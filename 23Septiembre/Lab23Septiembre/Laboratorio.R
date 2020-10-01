@@ -3,6 +3,8 @@ library(tidyverse)
 library(lubridate)
 library(readr)
 library(readxl)
+library(openxlsx)
+library(chron)
 
 ## Primer inciso
 # Ignorando zona horaria que no es importante en fenómenos astronómicos
@@ -24,17 +26,46 @@ resp
 
 
 ## Segundo inciso
-data <- read_excel('data.xlsx')
+data <- read.csv("data.csv", sep=";")
 
-convertir <- function(x){
-  if(typeof(x) != "character") {
-    return(as.Date(x))
-  } else {
-    return(dmy(x))
-  }
-}
+data$`Fecha.Creación` <- dmy(data$`Fecha.Creación`)
+#data$`Hora.Creación` <- strptime(data$`Hora.Creación`, "%I:%M %p")
 
-data$`Fecha Creación` <- guess_formats(data$`Fecha Creación`, c('ymd'))
+data$`Fecha.Final` <- dmy(data$`Fecha.Final`)
+#data$`Hora.Final` <-  strptime(data$`Hora.Final`, "%I:%M %p")
+
+
+primer <- data %>% group_by(month(Fecha.Creación), Cod) %>% summarise(llamadas = sum(Call)) %>% filter(llamadas > 0) %>% arrange(desc(llamadas))
+primer <- primer %>% rename(mes = `month(Fecha.Creación)`)
+
+
+segundo <- data %>% group_by(wday(Fecha.Creación, label = TRUE)) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(desc(total))
+
+tercero <- data %>% group_by(month(Fecha.Creación)) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(desc(total))
+
+library(ggplot2)
+theme_set(theme_minimal())
+cuarto <- data %>% group_by(Fecha.Creación) %>% summarise(llamadas = sum(Call), correo = sum(Email), mensaje = sum(SMS), total = llamadas + correo + mensaje) %>%  arrange(Fecha.Creación)
+ggplot(data = cuarto, aes(x = Fecha.Creación, y = llamadas))+
+  geom_line(color = "#00AFBB", size = 1)
+
+
+data$Día.Creación <- paste(data$Fecha.Creación, data$Hora.Creación)
+data$Día.Creación <- parse_date_time(data$Día.Creación, c('%Y-%m-%d %I:%M %p'))
+data$Día.Final <- paste(data$Fecha.Final, data$Hora.Final)
+data$Día.Final <- parse_date_time(data$Día.Final, c('%Y-%m-%d %I:%M %p'))
+
+
+quinto_data <- data %>% filter(Call > 0) 
+
+quinto <- mean(
+  difftime(quinto_data$Día.Final, quinto_data$Día.Creación, units = 'mins')
+  )
+
+
+sexto <- quinto_data
+sexto$tiempo_de_llamada <- difftime(sexto$Día.Final, sexto$Día.Creación, units = 'mins')
+sexto <- sexto %>% group_by(tiempo_de_llamada) %>% summarise(llamada = sum(Call)) %>%  arrange(tiempo_de_llamada) %>% filter(tiempo_de_llamada > -1)
 
 
 
